@@ -16,6 +16,7 @@ class TakesController extends Controller
         //biến $data này dùng để chứa các biến khác
         //nó sẽ truyền data từ controller đến View.
         $data = [];
+        //Tu moi cmts
         //Tạo ra 1 biến
         $name = 'my name is Tom.';
         //gán giá trị của biến $name cho $data với key là name
