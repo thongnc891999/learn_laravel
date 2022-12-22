@@ -16,49 +16,45 @@
 <a href="{{ route('tasks.create') }}" class="btn btn-info">Thêm mới</a>
 <table class="table table-bordered">
     <tr>
-        <th>Tasks ID</th>
+        <th>#</th>
         <th>Tasks Name</th>
+        <th>User</th>
         <th>Action</th>
-        <th></th>
-        <th></th>
+        <th>Images</th>
     </tr>
+    @foreach ($tasks as $key => $task)
     <tr>
-        <td>1</td>
-        <td>Task 1</td>
+        <td>{{ ++$key}}</td>
+        <td>{{ $task->name }}</td>
+        <td>{{ $task->user->name }}</td>
         <td>
-            <a href="{{ route('tasks.show', ['id' => 1]) }}" class="btn btn-primary">xem chi tiết</a>
+            <a href="{{ route('tasks.show', ['id' => $task->id]) }}" class="btn btn-primary">xem chi tiết</a>
         </td>
         <td>
-            <a href="{{ route('tasks.edit', ['id' => 1])}}" class="btn btn-success">Chỉnh sửa</a>
+            <a href="{{ route('tasks.edit',  ['id' => $task->id])}}" class="btn btn-success">Chỉnh sửa</a>
         </td>
         <td>
-            <form action="{{ route('tasks.destroy',['id => 1'])}}" method="POST">
+            {{-- <form action="{{ route('tasks.destroy', ['id' => $task->id])}}" method="POST"> cách 1: normal --}}
+            <form action="{{ route('tasks.destroy', ['task' => $task->id])}}" method="POST">
                 @csrf
                 @method('DELETE')
                 <button type="submit" onclick="return confirm('{{ __('message.confirm_delete') }}')"
                 class="btn btn-danger">submit to delete</button>
             </form>
         </td>
-    </tr>
-    <tr>
-        <td>2</td>
-        <td>Task 2</td>
         <td>
-            <a href="{{ route('tasks.show', ['id' => 2]) }}" class="btn btn-primary">xem chi tiết</a>
-        </td>
-        <td>
-            <a href="{{ route('tasks.edit', ['id' => 2])}}" class="btn btn-success">Chỉnh sửa</a>
-        </td>
-        <td>
-            <form action="{{ route('tasks.destroy',['id => 2'])}}" method="POST">
-                @csrf
-                @method('DELETE')
-                <button type="submit" onclick="return confirm('{{ __('message.confirm_delete') }}')"
-                class="btn btn-danger">submit to delete</button>
-            </form>
+            @if($task->image)
+            <img src="{{ $task->image }}" alt="{{ $task->name }}" />
+            @endif
         </td>
     </tr>
+    @endforeach
+    
 </table>
+{{-- Cách 1: hiển thị không gắn tham số --}}
+{{ $tasks->links() }}
+{{-- Cách 2: hiển thị có gắn tham số --}}
+
 @endsection
 
 @push('css')

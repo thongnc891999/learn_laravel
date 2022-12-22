@@ -40,7 +40,8 @@ Route::put('/tasks/{id}',[TakesController::class,'update'])->name('tasks.update'
 Route::get('/tasks/{id}',[TakesController::class,'show'])->name('tasks.show');
 
 // Route dành để xóa thông tin chi tiết 1 record của table
-Route::delete('/tasks/{id}',[TakesController::class,'destroy'])->name('tasks.destroy');
+//Route::delete('/tasks/{id}',[TakesController::class,'destroy'])->name('tasks.destroy'); // cách 1 normal
+Route::delete('/tasks/{task}',[TakesController::class,'destroy'])->name('tasks.destroy'); // cách 2: Injecting 1 class model Taks
 
 
 
