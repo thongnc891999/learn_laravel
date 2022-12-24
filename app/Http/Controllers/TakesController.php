@@ -270,6 +270,7 @@ class TakesController extends Controller
                 // $oldImage = str_replace('/storage/','',$oldImage);
                 if(File::exists(public_path($oldImage))){
                     File::delete(public_path($oldImage));
+                    // moi them
                 }
             }
             return redirect()->route('tasks.index')
