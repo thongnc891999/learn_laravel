@@ -27,7 +27,7 @@ class TaskFactory extends Factory
         return [
             'name'    =>$this->faker->name(),
             'user_id' => User::factory(),
-            'image'   => '/images/1.jpg', //ví dụ: có 1 hình ảnh nằm ở foder public/images/1.jpg
+            // 'image'   => '/images/1.jpg', //ví dụ: có 1 hình ảnh nằm ở foder public/images/1.jpg
             ];
     }
 }

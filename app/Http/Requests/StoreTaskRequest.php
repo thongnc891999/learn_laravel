@@ -32,7 +32,7 @@ class StoreTaskRequest extends FormRequest
             // xem giá trị của input name ="user_id" gửi lên có tồn tại trong table users
             // rule image: yêu cầu người dùng gửi lên phải là hình ảnh
             // rule mimes:jpg,bmp,png: yêu cầu gửi lên phải có đuôi jpg,bmp,png
-            'image'=>'nullable|image|mimes:jpg,bmp,png'
+            'image'=>'nullable|image|mimes:jpg,bmp,png,jfif'
         ];
     }
 }

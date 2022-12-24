@@ -9,6 +9,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 class TakesController extends Controller
 {
@@ -19,7 +20,7 @@ class TakesController extends Controller
      */
     public function index()
     {
-        
+        // dd(Storega::delete());
         //cách 1: Sử dụng Query Builder
         // $tasks = DB::table('tasks')->get();// method get lấy ra tất cả các record
         // $tasks = DB::table('tasks')->paginate(10);//method paginate(10): phân trang và hiển thị ra 10 record trong 1 trang
@@ -106,17 +107,17 @@ class TakesController extends Controller
         //     // Add image vào biến $dataSave // cách 1: add thêm storage
         //     $dataSave['image'] = $imagePath;
 
-        //     // cách 2: không add thêm storage thì ngoài view (views/tasks/index.blade.php)
-
         // }
 
+        // Xử lý upload file image
+        // kiểm tra xem có upload file lên không ?
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
             // method hasFile() : trả về true nếu gửi lên 1 hình ảnh.
             // method isValid() : trả về true nếu hình ảnh hợp lệ.
 
             $extension = $request->image->extension();
             $fileName = 'image_' . time() . '.' . $extension;
-            $request->image->storeAs('public/images', $fileName);
+            $request->image->storeAs('images', $fileName, ['disk'=>'public']);
 
             // add '/storage/' vào $imagePath
             $imagePath = '/storage/images/' . $fileName;
@@ -128,7 +129,7 @@ class TakesController extends Controller
             // <img src="{{ Storage::assert() }}" alt="">
         }
 
-
+       
         // Tạo ra 1 biến để lưu data vào table tasks 
         // $dataSave = $request->only(['name', 'user_id'])
         try {
@@ -232,10 +233,45 @@ class TakesController extends Controller
         $task->name = $request->input('name');
         $task->user_id = $request->input('user_id');
 
+        $oldImage = null;
+
+         // Xử lý upload file image
+        // kiểm tra xem có upload file lên không ?
+        if ($request->hasFile('new_image') && $request->file('new_image')->isValid()) {
+            // method hasFile() : trả về true nếu gửi lên 1 hình ảnh.
+            // method isValid() : trả về true nếu hình ảnh hợp lệ.
+
+            $extension = $request->new_image->extension();
+            $fileName = 'image_' . time() . '.' . $extension;
+            // Case 1: sử dụng storeAs
+            // $request->image->storeAs('public/images', $fileName); // case 1.1: không khai báo disk (disk default là local)
+            $request->new_image->storeAs('images', $fileName, ['disk' => 'public']); // case 1.2: khai báo disk = public
+
+            // add '/storage/' vào $imagePath
+            $imagePath = '/storage/images/' . $fileName;
+            
+            // gán giá trị hiện tại cho column tasks.image
+            $oldImage = $task->image;
+
+            // update đường dẫn mới cho image
+            $task->image = $imagePath;
+
+            // Case 2: không add thêm storage thì ngoài view (views/tasks/index.blade.php)
+            // <img src="{{ Storage::assert() }}" alt="">
+
+        }
+
 
         try{
             // Dùng method save() để thực hiện  update data xuống MySQL
             $task->save();
+
+            if(!is_null($oldImage)){
+                // $oldImage = str_replace('/storage/','',$oldImage);
+                if(File::exists(public_path($oldImage))){
+                    File::delete(public_path($oldImage));
+                }
+            }
             return redirect()->route('tasks.index')
             ->with('success', 'Cập nhật thành công');
         } catch (Exception $exception) {
@@ -292,11 +328,22 @@ class TakesController extends Controller
         // method findOrFail() khi thực thi nếu ko tìm thấy record thì báo lỗi
         // ngược lại thì chúng lấy được 1 object
         //$task = Task::findOrFail($id);
+
+            $oldImage = $task->image;
+
         try {
             //method delete(): Dùng để xóa 1 record ra khỏi table tasks
             // Lưu ý nếu $task không phải là 1 object (model Task) 
             // thì khi thục thi lệnh delete() nó sẽ báo lỗi.
             $task->delete();
+
+            //xóa hình ảnh cũ
+            if(!is_null($oldImage)){
+                // $oldImage = str_replace('/storage/','',$oldImage);
+                if(File::exists(public_path($oldImage))){
+                    File::delete(public_path($oldImage));
+                }
+            }
 
             // with: session flash chỉ tồn tại 1 lần và f5 thì biến mất
             return redirect( route('tasks.index'))->with('success', 'xóa thành công');

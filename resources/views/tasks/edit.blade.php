@@ -2,7 +2,7 @@
 {{-- set page title --}}
 @section('title', 'sửa task')
 @section('content')
-    <form action="{{ route('tasks.update',['id'=> $task->id])}}" method="POST"> 
+    <form action="{{ route('tasks.update',['id'=> $task->id])}}" method="POST" enctype="multipart/form-data"> 
 
         @csrf
         @method('PUT')
@@ -24,6 +24,18 @@
                 @endforeach;
             </select>
             @error('user_id')
+            <div class="text-danger">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="md-5">
+            <label for="">Task Image</label>
+            @if($task->image)
+            <img src="{{$task->image }}" alt="{{ $task->name}}">
+            @endif
+
+            <input type="file" name="new_image" class="form-control">
+            @error('new_image')
             <div class="text-danger">{{ $message }}</div>
             @enderror
         </div>
